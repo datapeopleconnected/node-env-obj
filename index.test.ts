@@ -42,3 +42,13 @@ Deno.test('Should overwrite defaults with values from env.', () => {
   assertEquals(config.get('name'), 'XYZ');
   assertEquals(config.get('app.name'), 'APP: XYZ');
 });
+
+Deno.test('Should createConfig, with test3.json.', () => {
+  const config = new Config({ configFile: 'test_data/test3.json' });
+  
+  assertEquals(config.get('STRING'), 'ABC');
+  assertEquals(config.get('NUMBER'), '2');
+  assertEquals(config.get('BOOL'), 'true');
+  assertEquals(config.get('OBJECT'), '%OBJECT%');
+  assertEquals(config.get('ARRAY'), '%ARRAY%');
+});

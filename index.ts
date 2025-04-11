@@ -43,10 +43,10 @@ interface EnvObject {
 type EnvObjectValue = string | EnvObject | string[] | EnvObject[] | undefined;
 
 interface ConfigObject {
-  global?: {
+  global: {
     [key: string]: EnvObjectValue;
   };
-  environment?: {
+  environment: {
     [key: string]: string;
   };
 }
@@ -164,7 +164,8 @@ export class Config {
 
   _loadSettings(env: { [key: string]: string | undefined }): EnvObject {
     const json = fs.readFileSync(this._options.configFullPath);
-    const settings: ConfigObject = JSON.parse(json.toString());
+    const raw: unknown = JSON.parse(json.toString());
+    const settings = this._loadSettingsObject(raw);
 
     // Build our settings environment object.
     for (const variable in settings.environment) {
@@ -188,6 +189,43 @@ export class Config {
     }
 
     return settings.global || {};
+  }
+
+  private _loadSettingsObject(raw: unknown): ConfigObject {
+    const settings : ConfigObject = {
+      global: {},
+      environment: {}
+    };
+
+    if (raw instanceof Object === false || Array.isArray(raw)) throw new Error(`Config file ${this._options.configFullPath} is expected to be an object.`);
+
+    if (typeof raw === 'object' && raw !== null) {
+      if ('environment' in raw && raw['environment'] instanceof Object) {
+        const env = raw['environment'] as { [key: string] : unknown };
+        for (const variable in env) {
+          if (typeof env[variable] === 'string' || typeof env[variable] === 'number' || typeof env[variable] === 'boolean') {
+            settings.environment[variable] = env[variable].toString();
+          } else if (this._options.verbose) {
+            console.warn(`WARN: The property ${variable} in environment should be a string.`);
+          }
+        }
+      }
+
+      if ('global' in raw && raw['global'] instanceof Object) {
+        const global = raw['global'] as EnvObject;
+        for (const variable in global) {
+          if (this._isEnvObject(global[variable])) {
+            settings.global[variable] = global[variable];
+          } else if (typeof global[variable] === 'string') {
+            settings.global[variable] = global[variable];
+          } else if (Array.isArray(global[variable])) {
+            settings.global[variable] = global[variable];
+          }
+        }
+      }
+    }
+
+    return settings;
   }
 
   private _isEnvObject = function (value: EnvObjectValue) {
