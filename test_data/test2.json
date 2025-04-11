@@ -1,0 +1,18 @@
+{
+  "environment": {
+    "APP_NAME": "ABC",
+    "GOOGLE_AUTH_ID": "1234567890-abcde.apps.googleusercontent.com"
+  },
+  "global": {
+    "name": "%APP_NAME%",
+    "app": {
+      "name": "APP: %APP_NAME%",
+      "version": "1.0.0"
+    },
+    "auth": {
+      "google": {
+        "id": "%GOOGLE_AUTH_ID%"
+      }
+    }
+  }
+}
