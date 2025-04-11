@@ -73,7 +73,7 @@ export class Config {
 
   private _settings: EnvObject;
 
-  constructor(opts: ConfigOptionsIn) {
+  constructor(opts?: ConfigOptionsIn) {
     const _env = process.env['NODE_ENV'] || 'production';
     this._envKey = getEnvKey(_env);
 
@@ -309,7 +309,7 @@ export function getEnvObject(path: string): EnvObject | undefined {
   return _instance.getEnvObject(path);
 }
 
-export default (args: ConfigOptionsIn): EnvObject => {
+export default (args?: ConfigOptionsIn): EnvObject => {
   if (!_instance) {
     _instance = new Config(args);
   }
