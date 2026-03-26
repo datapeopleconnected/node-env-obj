@@ -1,0 +1,9 @@
+{
+  "name": "@dpc/node-env-obj",
+  "description": "Compile environment vars into a predefined accessible object structure.",
+  "version": "0.3.2",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "exports": "./index.ts",
+  "author": "Data People Connected LTD"
+}
