@@ -52,11 +52,12 @@ interface ConfigObject {
 }
 
 /**
- * @type {{development: string, production: string, test: string}}
+ * @type {{development: string, staging: string, production: string, test: string}}
  * @private
  */
 const getEnvKey = (env: string) => {
   if (env === 'development') return 'dev';
+  else if (env === 'staging') return 'staging';
   else if (env === 'test') return 'test';
   return 'prod';
 };
