@@ -1,0 +1,22 @@
+{
+  "environment": {
+    "STRING": "ABC",
+    "NUMBER": 2,
+    "BOOL": true,
+    "OBJECT": {
+      "WHAT": "OTHER"
+    },
+    "ARRAY": [
+      "ONE",
+      "TWO",
+      "THREE"
+    ]
+  },
+  "global": {
+    "STRING": "%STRING%",
+    "NUMBER": "%NUMBER%",
+    "BOOL": "%BOOL%",
+    "OBJECT": "%OBJECT%",
+    "ARRAY": "%ARRAY%"
+  }
+}
