@@ -114,6 +114,19 @@ Defaults:
 - `configFile`: `config.json`
 - `verbose`: `false`
 
+## Env File Format
+
+The env file has one `KEY=value` per line, split at the first `=`:
+
+- Whitespace around the key and the value is trimmed, so trailing spaces and Windows (CRLF) line endings don't end up in values.
+- One pair of matching surrounding quotes (`'…'` or `"…"`) is removed, so `HOSTS="a.com,b.com"` gives `a.com,b.com`. Quote a value to keep leading or trailing spaces: `PREFIX=" > "`.
+- Everything else is kept exactly as written: `$`, `#`, `=` and quotes inside a value (`it's`, `a"b"c`), or quotes that don't match (`"abc'`).
+- Lines whose key is empty or contains `#` are ignored.
+
+Values from the env file are copied into `process.env`, overwriting variables already set.
+
+Placeholders are replaced literally: a value is inserted exactly as it is, and isn't scanned again for placeholders.
+
 ## Environment Selection Keys
 
 For objects that contain environment-specific values, the selected key is based on `NODE_ENV`:
