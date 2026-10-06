@@ -64,6 +64,33 @@ const getEnvKey = (env: string) => {
 const _regEx = /%(\w+)%/g;
 
 /**
+ * Parses one env file value. Surrounding whitespace (including a CRLF file's `\r`) is trimmed,
+ * then one pair of matching surrounding quotes ('…' or "…") is stripped. Everything else,
+ * including `$`, `#`, `=` and quotes inside the value, is kept exactly as written.
+ * @private
+ */
+const _parseEnvValue = (raw: string): string => {
+  const value = raw.trim();
+  const quote = value[0];
+  if (value.length >= 2 && (quote === '"' || quote === "'") && value[value.length - 1] === quote) {
+    return value.slice(1, -1);
+  }
+  return value;
+};
+
+/**
+ * Replaces each `%KEY%` in target with values[KEY], literally: a value is inserted exactly as it
+ * is (no `$` patterns) and isn't scanned again for placeholders. Unknown keys are left as they are.
+ * @private
+ */
+const _substitute = (target: string, values: { [key: string]: string | undefined }): string => {
+  return target.replace(_regEx, (match: string, key: string) => {
+    const value = values[key];
+    return typeof value === 'string' ? value : match;
+  });
+};
+
+/**
  * @class Config
  *
  */
@@ -245,18 +272,7 @@ export class Config {
   };
 
   private _resolveReferences = function (target: string, values: { [key: string]: string | undefined }) {
-    const matches = target.match(_regEx);
-
-    if (matches) {
-      matches.forEach((match) => {
-        const key = match.replace(/%/g, '');
-        if (typeof values[key] === 'string') {
-          target = target.replace(`%${key}%`, values[key]);
-        }
-      });
-    }
-
-    return target;
+    return _substitute(target, values);
   };
 
   private _flatternEnvObjectOptions(objectValue: EnvObjectValue) {
@@ -282,13 +298,10 @@ export class Config {
 
   private _parseEnvFile(data: string) {
     return data.split('\n').reduce((obj: { [key: string]: string }, line) => {
-      const lineSplit = line.split('=');
-      if (lineSplit.length > 0) {
-        const key = lineSplit.shift();
-        const value = lineSplit.join('=');
-        if (key === undefined || key === '' || key.indexOf('#') >= 0) return obj;
-        obj[key] = value;
-      }
+      const separator = line.indexOf('=');
+      const key = (separator >= 0 ? line.slice(0, separator) : line).trim();
+      if (key === '' || key.indexOf('#') >= 0) return obj;
+      obj[key] = separator >= 0 ? _parseEnvValue(line.slice(separator + 1)) : '';
       return obj;
     }, {});
   };
